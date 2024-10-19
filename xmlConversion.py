@@ -13,9 +13,9 @@ PROPERTIES_TAG = 'properties'
 PROPERTY_TAG = 'property'
 
 # Check if the input file exists
-if not os.path.exists(INPUT_FILE):
-    print(f"Input file '{INPUT_FILE}' does not exist. Skipping conversion.")
-    sys.exit(1)  # Exit with a non-zero status to indicate failure
+# if not os.path.exists(INPUT_FILE):
+#     print(f"Input file '{INPUT_FILE}' does not exist. Skipping conversion.")
+#     sys.exit(1)  # Exit with a non-zero status to indicate failure
 
 def read_xml_file(file_path):
     with open(file_path, 'r') as file:
