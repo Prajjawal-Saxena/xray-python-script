@@ -2,7 +2,7 @@ import xml.etree.ElementTree as ET
 from xml.dom import minidom
 
 # Constants
-INPUT_FILE = 'jenkins_report.xml'  # Replace with your actual file name
+INPUT_FILE = 'newman_report.xml'  # Replace with your actual file name
 OUTPUT_FILE = 'xray_compatible_report.xml'  # Output file name
 TESTSUITE_TAG = 'testsuite'
 TESTCASE_TAG = 'testcase'
