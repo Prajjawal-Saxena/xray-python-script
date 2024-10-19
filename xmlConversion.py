@@ -4,6 +4,9 @@ from xml.dom import minidom
 # Constants
 INPUT_FILE = 'newman_report.xml'  # Replace with your actual file name
 OUTPUT_FILE = 'xray_compatible_report.xml'  # Output file name
+if not os.path.exists(INPUT_FILE):
+    print(f"Input file '{INPUT_FILE}' does not exist. Skipping conversion.")
+    exit(1)
 TESTSUITE_TAG = 'testsuite'
 TESTCASE_TAG = 'testcase'
 FAILURE_TAG = 'failure'
