@@ -1,14 +1,21 @@
+import os
+import sys
 import xml.etree.ElementTree as ET
 from xml.dom import minidom
 
 # Constants
-INPUT_FILE = 'newman_report.xml'  # Replace with your actual file name
-OUTPUT_FILE = 'xray_compatible_report.xml'  # Output file name
+INPUT_FILE = 'newman_report.xml'  # Input file in the job workspace
+OUTPUT_FILE = 'xray_compatible_report.xml'  # Output file in the job workspace
 TESTSUITE_TAG = 'testsuite'
 TESTCASE_TAG = 'testcase'
 FAILURE_TAG = 'failure'
 PROPERTIES_TAG = 'properties'
 PROPERTY_TAG = 'property'
+
+# Check if the input file exists
+if not os.path.exists(INPUT_FILE):
+    print(f"Input file '{INPUT_FILE}' does not exist. Skipping conversion.")
+    sys.exit(1)  # Exit with a non-zero status to indicate failure
 
 def read_xml_file(file_path):
     with open(file_path, 'r') as file:
@@ -18,7 +25,7 @@ def read_xml_file(file_path):
 def parse_testsuites(content):
     start_index = content.find('<testsuites')
     if start_index == -1:
-        raise ValueError("No <testsuites> element found in the XML file.")
+        raise ValueError('No <testsuites> element found in the XML file.')
     relevant_content = content[start_index:]
     return ET.fromstring(relevant_content)
 
@@ -68,16 +75,13 @@ def add_testcase(new_testsuite, testcase, suite_name):
         'value': suite_name
     })
 
-    # Check for failures in the testcase
     failure_elements = testcase.findall(FAILURE_TAG)
     if failure_elements:
-        # If there are failures, set status to FAIL
         status = 'FAIL'
         ET.SubElement(properties, PROPERTY_TAG, {
             'name': 'status',
             'value': status
         })
-        # Add failure details
         for failure in failure_elements:
             failure_message = failure.get('message')
             failure_element = ET.SubElement(new_testcase, FAILURE_TAG, {
@@ -85,22 +89,20 @@ def add_testcase(new_testsuite, testcase, suite_name):
                 'message': failure_message
             })
             failure_text = ''.join(failure.itertext()).strip()
-            failure_element.text = failure_text.splitlines()[0]  # Only take the first line of text
+            failure_element.text = failure_text.splitlines()[0]
     else:
-        # If no failures, set status to PASS
         status = 'PASS'
         ET.SubElement(properties, PROPERTY_TAG, {
             'name': 'status',
             'value': status
         })
-        # Add a success message as a child element instead of an attribute
         success_message = ET.SubElement(new_testcase, 'success_message')
         success_message.text = f'Test validation: "{test_name}" passed successfully.'
 
 def pretty_print_xml(element):
     xml_str = ET.tostring(element, encoding='utf-8', method='xml')
     parsed_xml = minidom.parseString(xml_str)
-    return parsed_xml.toprettyxml(indent="    ")
+    return parsed_xml.toprettyxml(indent='    ')
 
 def write_output_file(output_root, file_path):
     with open(file_path, 'w') as xml_file:
@@ -122,7 +124,7 @@ def main():
 
     output_root.set('time', str(total_time))
     write_output_file(output_root, OUTPUT_FILE)
-    print(f"XML file created successfully: {OUTPUT_FILE}")
+    print(f'XML file created successfully: {OUTPUT_FILE}')
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
