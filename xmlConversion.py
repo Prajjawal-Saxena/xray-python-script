@@ -12,11 +12,6 @@ FAILURE_TAG = 'failure'
 PROPERTIES_TAG = 'properties'
 PROPERTY_TAG = 'property'
 
-# Check if the input file exists
-# if not os.path.exists(INPUT_FILE):
-#     print(f"Input file '{INPUT_FILE}' does not exist. Skipping conversion.")
-#     sys.exit(1)  # Exit with a non-zero status to indicate failure
-
 def read_xml_file(file_path):
     with open(file_path, 'r') as file:
         content = file.read()
@@ -31,10 +26,12 @@ def parse_testsuites(content):
 
 def create_output_structure(root):
     root_name = root.get('name')
+    # Add the 'classname' attribute with the same value as the 'name' attribute
     output_root = ET.Element('testsuites', {
         'name': root_name,
         'tests': str(len(root.findall(TESTSUITE_TAG))),
-        'time': '0.0'
+        'time': '0.0',
+        'classname': root_name  # Set 'classname' equal to 'name'
     })
     return output_root
 
@@ -61,10 +58,14 @@ def add_testsuite(output_root, testsuite):
 def add_testcase(new_testsuite, testcase, suite_name):
     test_name = testcase.get('name')
     test_classname = testcase.get('classname')
+
+    # Convert 'classname' to uppercase
+    test_classname_upper = test_classname.upper()
+
     test_time = testcase.get('time')
 
     new_testcase = ET.SubElement(new_testsuite, TESTCASE_TAG, {
-        'classname': test_classname,
+        'classname': test_classname_upper,  # Use the uppercase classname
         'name': test_name,
         'time': test_time
     })
