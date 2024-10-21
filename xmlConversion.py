@@ -2,6 +2,7 @@ import os
 import sys
 import xml.etree.ElementTree as ET
 from xml.dom import minidom
+import re  # Import regular expressions module
 
 # Constants
 INPUT_FILE = 'newman_report.xml'  # Input file in the job workspace
@@ -55,17 +56,28 @@ def add_testsuite(output_root, testsuite):
 
     return suite_time, new_testsuite, suite_failures
 
+def format_classname_with_space(classname):
+    # Convert to uppercase and insert a space between the alphabetic and numeric parts
+    match = re.match(r'([A-Za-z]+)(\d+)', classname)  # Match alphabetic part followed by numeric part
+    if match:
+        # Add space between the two parts and return uppercase version
+        formatted_classname = f"{match.group(1).upper()} {match.group(2)}"
+    else:
+        # If no match, just return the uppercase version of the classname
+        formatted_classname = classname.upper()
+    return formatted_classname
+
 def add_testcase(new_testsuite, testcase, suite_name):
     test_name = testcase.get('name')
     test_classname = testcase.get('classname')
 
-    # Convert 'classname' to uppercase
-    test_classname_upper = test_classname.upper()
+    # Format classname by converting to uppercase and adding space between alphabetic and numeric parts
+    test_classname_formatted = format_classname_with_space(test_classname)
 
     test_time = testcase.get('time')
 
     new_testcase = ET.SubElement(new_testsuite, TESTCASE_TAG, {
-        'classname': test_classname_upper,  # Use the uppercase classname
+        'classname': test_classname_formatted,  # Use the formatted classname
         'name': test_name,
         'time': test_time
     })
